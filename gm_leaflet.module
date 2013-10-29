@@ -24,8 +24,8 @@ function gm_leaflet_ctools_plugin_type() {
   $plugins = array();
 
   $plugins['maps'] = array();
-
-  $plugins['layers'] = array();
+  $plugins['base_layers'] = array();
+  $plugins['overlay_layers'] = array();
 
   return $plugins;
 }
@@ -39,11 +39,87 @@ function gm_leaflet_get_maps($map_name = '') {
   }
 }
 
-function gm_leaflet_get_layers($layer_name = '') {
+function gm_leaflet_get_base_layers($layer_name = '') {
   ctools_include('plugins');
   if ($layer_name) {
-    return ctools_get_plugins('gm_leaflet', 'layers', $layer_name);
+    return ctools_get_plugins('gm_leaflet', 'base_layers', $layer_name);
   } else {
-    return ctools_get_plugins('gm_leaflet', 'layers');
+    return ctools_get_plugins('gm_leaflet', 'base_layers');
   }
+}
+
+function gm_leaflet_get_overlay_layers($layer_name = '') {
+  ctools_include('plugins');
+  if ($layer_name) {
+    return ctools_get_plugins('gm_leaflet', 'overlay_layers', $layer_name);
+  } else {
+    return ctools_get_plugins('gm_leaflet', 'overlay_layers');
+  }
+}
+
+/**
+ * Implements hook_library().
+ * Provide basic plugins predicted to be desired in all/most maps.
+ *
+ * @todo Each library should have an entry in hook_requirements to ensure if the library exists and perhaps link to where to download it.
+ */
+function gm_leaflet_library() {
+  $libraries = array();
+
+  $path = libraries_get_path('leaflet');
+  $libraries['leaflet'] = array(
+    'title' => 'Leaflet Mapping API',
+    'version' => '0.5.1',
+    'js' => array(
+      array(
+        'type' => 'file',
+        'data' => $path . "/dist/leaflet.js",
+        'group' => JS_LIBRARY,
+        'preprocess' => FALSE,
+      ),
+    ),
+    'css' => array(
+      $path . "/dist/leaflet.css" => array(
+        'type' => 'file',
+        'media' => 'screen',
+      ),
+      $path . "/dist/leaflet.ie.css" => (
+        'browsers' => array(
+          'IE' => 'lte IE 8',
+          '!IE' => FALSE,
+        ),
+      ),
+    ),
+  );
+
+  $libraries['leaflet_markercluster'] = array(
+    'title' => 'Leaflet Markercluster',
+    'version' => 0, // we don't have a version
+    'js' => array(
+      array(
+        'type' => 'file',
+        'data' => libraries_get_path('leaflet_markercluster') . "/dist/leaflet.markercluster.js",
+        'group' => JS_LIBRARY,
+        'preprocess' => FALSE,
+      ),
+    ),
+    'css' => array(
+      libraries_get_path('leaflet_markercluster') . "/dist/MarkerCluster.css" => array(
+        'type' => 'file',
+        'media' => 'screen',
+      ),
+      libraries_get_path('leaflet_markercluster') . "/dist/MarkerCluster.Default.css" => array(
+        'type' => 'file',
+        'media' => 'screen',
+      ),
+      libraries_get_path('leaflet_markercluster') . "/dist/MarkerCluster.Default.ie.css" => array(
+        'browsers' => array(
+          'IE' => 'lte IE 8',
+          '!IE' => FALSE,
+        ),
+      ),
+    ),
+  );
+
+  return $libraries;
 }
