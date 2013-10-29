@@ -1,0 +1,49 @@
+<?php
+/**
+ * @file gm_leaflet.module
+ */
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function gm_leaflet_ctools_plugin_api() {
+  return array('version' => 1);
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function gm_leaflet_ctools_plugin_directory($module, $plugin) {
+  return 'plugins/' . $plugin;
+}
+
+/**
+ * Implements hook_ctools_plugin_type()
+ */
+function gm_leaflet_ctools_plugin_type() {
+  $plugins = array();
+
+  $plugins['maps'] = array();
+
+  $plugins['layers'] = array();
+
+  return $plugins;
+}
+
+function gm_leaflet_get_maps($map_name = '') {
+  ctools_include('plugins');
+  if ($map_name) {
+    return ctools_get_plugins('gm_leaflet', 'maps', $map_name);
+  } else {
+    return ctools_get_plugins('gm_leaflet', 'maps');
+  }
+}
+
+function gm_leaflet_get_layers($layer_name = '') {
+  ctools_include('plugins');
+  if ($layer_name) {
+    return ctools_get_plugins('gm_leaflet', 'layers', $layer_name);
+  } else {
+    return ctools_get_plugins('gm_leaflet', 'layers');
+  }
+}
