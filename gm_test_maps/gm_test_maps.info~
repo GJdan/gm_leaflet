@@ -1,3 +1,0 @@
-name = Test gm_leaflet
-description = a throwaway module for testing
-dependencies[] = gm_leaflet
