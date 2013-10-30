@@ -13,8 +13,9 @@
       var overlayLayers = {};
 
       // Add base layers
-      $.each(mapSettings['base layers'], function(name, layerSettings){
+      $.each(mapSettings['base layers'], function(name, layerSettings) {
         var layer;
+
         if (layerSettings.type == 'tile layer') {
           layer = gmLeafletAddTileLayer(name, layerSettings);
         }
@@ -28,6 +29,23 @@
         }
       });
 
+      // Add overlay layers
+      $.each(mapSettings['overlay layers'], function(name, layerSettings) {
+        var layer = L.featureGroup();
+
+        // If the data is GeoJSON we may have to prepare it for the leaflet constructor...
+        if (layerSettings.type == 'GeoJSON') {
+          gmLeafletAddGeoJSONLayer(name, layerSettings, layer);
+        }
+
+        if (!mapSettings['enabled overlay layers'] || $.inArray(name, mapSettings['enabled overlay layers']) != -1) {
+          layer.addTo(map);
+        }
+        if (!mapSettings['switcher overlay layers'] || $.inArray(name, mapSettings['switcher overlay layers']) != -1) {
+          overlayLayers[layerSettings.name] = layer;
+        }
+      });
+
       L.control.layers(baseLayers, overlayLayers).addTo(map);
     }
   };
@@ -36,6 +54,23 @@ function gmLeafletAddTileLayer(name, layerSettings) {
   var layer = L.tileLayer(layerSettings['url template'], layerSettings.settings);
 
   return layer;
+}
+
+function gmLeafletAddGeoJSONLayer(layerName, layerSettings, layer) {
+  $.each(layerSettings.data, function(i, featureSettings) {
+    var geom;
+
+    // @todo Add conditions for object and file.
+    if (layerSettings.format == 'text') {
+      geom = JSON.parse(featureSettings.data);
+    }
+
+    var feature = new L.GeoJSON(geom, featureSettings.settings);
+    if (featureSettings.popup) {
+      feature.bindPopup(featureSettings.popup);
+    }
+    layer.addLayer(feature);
+  });
 }
 
 })(jQuery);

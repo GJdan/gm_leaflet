@@ -30,8 +30,16 @@ function gm_leaflet_ctools_plugin_type() {
       'settings' => array(),
     ),
   );
-  $plugins['base_layers'] = array();
-  $plugins['overlay_layers'] = array();
+  $plugins['base_layers'] = array(
+    'defaults' => array(
+      'settings' => array(),
+    ),
+  );
+  $plugins['overlay_layers'] = array(
+    'defaults' => array(
+      'settings' => array(),
+    ),
+  );
   $plugins['custom'] = array(); // This plugin type is for adding arbitrary javascript to a map.  Can be used to add literally anything that isn't covered by the previous plugins.
 
   return $plugins;
@@ -159,15 +167,19 @@ function _gm_leaflet_prepare_maps_plugin(&$map) {
   $map['base layers'] = array();
 
   foreach ($layers as $key => $layer) {
-    $data = gm_leaflet_get_base_layers($layer);
-    $map['base layers'][$layer] = $data;
+    $plugin = gm_leaflet_get_base_layers($layer);
+    $map['base layers'][$layer] = $plugin;
   }
 
   $layers = $map['overlay layers'];
   $map['overlay layers'] = array();
 
   foreach ($layers as $key => $layer) {
-    $data = gm_leaflet_get_base_layers($layer);
-    $map['overlay layers'][$layer] = $data;
+    $plugin = gm_leaflet_get_overlay_layers($layer);
+    $map['overlay layers'][$layer] = $plugin;
+
+    $callback = ctools_plugin_get_function($plugin, 'data callback');
+    $data = $callback();
+    $map['overlay layers'][$layer]['data'] = $data;
   }
 }
