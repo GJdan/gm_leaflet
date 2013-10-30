@@ -1,0 +1,7 @@
+(function ($) {
+
+  Drupal.behaviors.gm_leafletMap = {
+    var map = L.map();
+  };
+
+})(jQuery);

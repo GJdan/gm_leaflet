@@ -23,15 +23,23 @@ function gm_leaflet_ctools_plugin_directory($module, $plugin) {
 function gm_leaflet_ctools_plugin_type() {
   $plugins = array();
 
-  $plugins['maps'] = array();
+  $plugins['maps'] = array(
+    'defaults' => array(
+      'base layers' => array(),
+      'overlay layers' => array(),
+      'settings' => array(),
+    ),
+  );
   $plugins['base_layers'] = array();
   $plugins['overlay_layers'] = array();
+  $plugins['custom'] = array(); // This plugin type is for adding arbitrary javascript to a map.  Can be used to add literally anything that isn't covered by the previous plugins.
 
   return $plugins;
 }
 
 function gm_leaflet_get_maps($map_name = '') {
   ctools_include('plugins');
+
   if ($map_name) {
     return ctools_get_plugins('gm_leaflet', 'maps', $map_name);
   } else {
@@ -83,7 +91,7 @@ function gm_leaflet_library() {
         'type' => 'file',
         'media' => 'screen',
       ),
-      $path . "/dist/leaflet.ie.css" => (
+      $path . "/dist/leaflet.ie.css" => array(
         'browsers' => array(
           'IE' => 'lte IE 8',
           '!IE' => FALSE,
@@ -122,4 +130,42 @@ function gm_leaflet_library() {
   );
 
   return $libraries;
+}
+
+function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $width = '400px') {
+  drupal_add_library('gm_leaflet', 'leaflet');
+
+  $map = gm_leaflet_get_maps($map_name);
+  $map_id = $map_id ? $map_id : $map_name;
+  $map['id'] = $map_id;
+  _gm_leaflet_prepare_maps_plugin($map);
+
+  drupal_add_js(array('gm_leaflet' => array('map' => $map)), 'setting');  // Add map plugin to the drupal settings js object.
+  drupal_add_js(drupal_get_path('module', 'gm_leaflet') . '/js/gm_leaflet.map.js');
+
+  return array(
+    '#type' => 'markup',
+    '#markup' => '<div id="' . $map_id . '" style="height: ' . $height . '; width: ' . $width . ';" ></div>'
+  );
+}
+
+/**
+ * Populates base layer and overlay layer properties with their related plugins data.
+ */
+function _gm_leaflet_prepare_maps_plugin(&$map) {
+  $layers = $map['base layers'];
+  $map['base layers'] = array();
+
+  foreach ($layers as $key => $layer) {
+    $data = gm_leaflet_get_base_layers($layer);
+    $map['base layers'][$layer] = $data;
+  }
+
+  $layers = $map['overlay layers'];
+  $map['overlay layers'] = array();
+
+  foreach ($layers as $key => $layer) {
+    $data = gm_leaflet_get_base_layers($layer);
+    $map['overlay layers'][$layer] = $data;
+  }
 }

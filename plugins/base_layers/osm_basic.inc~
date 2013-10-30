@@ -1,0 +1,16 @@
+<?php
+/**
+ * @file
+ * osm_basic.inc
+ *
+ * Provides the Open Street Map Basic base layer.
+ */
+
+$plugin = array(
+  'name' => t('OSM Basic'),
+  'type' => 'tile layer',
+  'settings' => array(
+    'attribution' => t('© OpenStreetMap contributors'),
+    'maxZoom' => 18,
+  ),
+);

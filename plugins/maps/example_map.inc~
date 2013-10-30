@@ -1,0 +1,13 @@
+<?php
+/**
+ * @file
+ * example_map.inc
+ */
+
+$plugin = array(
+  'name' => t('Example Map'),
+  'description' => t('An exampe map to demonstrate how to use this module.'),
+  'base layers' => array('osm_basic'),
+  'width' => 400, // Width and height are in pixels.
+  'height' => 400,
+);
