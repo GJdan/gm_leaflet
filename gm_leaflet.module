@@ -139,6 +139,8 @@ function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $widt
   $map_id = $map_id ? $map_id : $map_name;
   $map['id'] = $map_id;
   _gm_leaflet_prepare_maps_plugin($map);
+  $map['baseLayerCount'] = count($map['base layers']);
+  $map['overlayLayerCount'] = count($map['overlay layers']);
 
   drupal_add_js(array('gm_leaflet' => array('map' => $map)), 'setting');  // Add map plugin to the drupal settings js object.
   drupal_add_js(drupal_get_path('module', 'gm_leaflet') . '/js/gm_leaflet.map.js');

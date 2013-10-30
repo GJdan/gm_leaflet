@@ -1,8 +1,18 @@
 <?php
 /**
- * test test test
+ * @file gm_test_maps.module
  */
 
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function gm_test_maps_ctools_plugin_directory($module, $plugin) {
+  return 'plugins/' . $plugin;
+}
+
+/**
+ * Implements hook_menu().
+ */
 function gm_test_maps_menu() {
   $items = array();
 
