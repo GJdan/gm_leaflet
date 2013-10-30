@@ -1,0 +1,33 @@
+<?php
+/**
+ * @file gm_leaflet_example.module
+ */
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function gm_leaflet_example_ctools_plugin_directory($module, $plugin) {
+  return 'plugins/' . $plugin;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function gm_leaflet_example_menu() {
+  $items = array();
+
+  $items['gm_leaflet_example'] = array(
+    'title' => 'TEST MAPS',
+    'page callback' => 'gm_leaflet_example_test_maps',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+function gm_leaflet_example_test_maps() {
+  $output = gm_leaflet_render_map('example_map', 'gm_leaflet_example');
+
+  return $output;
+}
