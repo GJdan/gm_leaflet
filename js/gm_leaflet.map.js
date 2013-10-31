@@ -7,7 +7,19 @@
       var mapSettings = Drupal.settings.gm_leaflet.map;
 
       // Create Map
-      var map = L.map(mapSettings.id, mapSettings.settings).setView([mapSettings.lat, mapSettings.lon], mapSettings.zoom);
+      var map = L.map(mapSettings.id, mapSettings.settings);
+
+      if (mapSettings.zoomToLayer) {
+        if (mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.boundingBox) {
+          bBox = mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.boundingBox;
+          map.fitBounds([[bBox.miny, bBox.minx], [bBox.maxy, bBox.maxx]]);
+        } else if (mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.centroid) {
+          view = mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView
+          map.setView([view.centroid.lat, view.centroid.lon], view.zoom);
+        }
+      } else {
+        map.setView([mapSettings.lat, mapSettings.lon], mapSettings.zoom);
+      }
 
       var baseLayers = {};
       var overlayLayers = {};
@@ -57,15 +69,35 @@ function gmLeafletAddTileLayer(name, layerSettings) {
 }
 
 function gmLeafletAddGeoJSONLayer(layerName, layerSettings, layer) {
-  $.each(layerSettings.data, function(i, featureSettings) {
+  $.each(layerSettings.data.features, function(i, featureSettings) {
     var geom;
 
     // @todo Add conditions for object and file.
     if (layerSettings.format == 'text') {
       geom = JSON.parse(featureSettings.data);
+    };
+    markerOptions = {
+      radius: 5,
+      fillColor: '#03f',
+      color: '#03f',
+      weight: 5,
+      opacity: 0.5,
+      fillOpacity: 0.2
+    };
+
+    if (featureSettings.settings.style && featureSettings.settings.style.color) {
+      markerOptions.fillColor = featureSettings.settings.style.color;
+      markerOptions.color = featureSettings.settings.style.color;
     }
 
-    var feature = new L.GeoJSON(geom, featureSettings.settings);
+    jsonOptions = {
+      pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, markerOptions);
+      }
+    };
+    $.extend(jsonOptions, featureSettings.settings);
+
+    var feature = new L.GeoJSON(geom, jsonOptions);
     if (featureSettings.popup) {
       feature.bindPopup(featureSettings.popup);
     }

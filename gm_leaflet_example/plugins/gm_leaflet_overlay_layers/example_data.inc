@@ -18,9 +18,9 @@ $plugin = array(
  *         Each element of the returned array will be used as a feature and merged into a layer group.
  */
 function gm_leaflet_example_data() {
-  $data = array();
+  $data = array('features' => array());
 
-  $data[] = array(
+  $data['features'][] = array(
     'data' => '{
   "type": "Feature",
   "crs": {

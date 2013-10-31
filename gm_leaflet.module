@@ -23,19 +23,19 @@ function gm_leaflet_ctools_plugin_directory($module, $plugin) {
 function gm_leaflet_ctools_plugin_type() {
   $plugins = array();
 
-  $plugins['maps'] = array(
+  $plugins['gm_leaflet_maps'] = array(
     'defaults' => array(
       'base layers' => array(),
       'overlay layers' => array(),
       'settings' => array(),
     ),
   );
-  $plugins['base_layers'] = array(
+  $plugins['gm_leaflet_base_layers'] = array(
     'defaults' => array(
       'settings' => array(),
     ),
   );
-  $plugins['overlay_layers'] = array(
+  $plugins['gm_leaflet_overlay_layers'] = array(
     'defaults' => array(
       'settings' => array(),
     ),
@@ -49,27 +49,27 @@ function gm_leaflet_get_maps($map_name = '') {
   ctools_include('plugins');
 
   if ($map_name) {
-    return ctools_get_plugins('gm_leaflet', 'maps', $map_name);
+    return ctools_get_plugins('gm_leaflet', 'gm_leaflet_maps', $map_name);
   } else {
-    return ctools_get_plugins('gm_leaflet', 'maps');
+    return ctools_get_plugins('gm_leaflet', 'gm_leaflet_maps');
   }
 }
 
 function gm_leaflet_get_base_layers($layer_name = '') {
   ctools_include('plugins');
   if ($layer_name) {
-    return ctools_get_plugins('gm_leaflet', 'base_layers', $layer_name);
+    return ctools_get_plugins('gm_leaflet', 'gm_leaflet_base_layers', $layer_name);
   } else {
-    return ctools_get_plugins('gm_leaflet', 'base_layers');
+    return ctools_get_plugins('gm_leaflet', 'gm_leaflet_base_layers');
   }
 }
 
 function gm_leaflet_get_overlay_layers($layer_name = '') {
   ctools_include('plugins');
   if ($layer_name) {
-    return ctools_get_plugins('gm_leaflet', 'overlay_layers', $layer_name);
+    return ctools_get_plugins('gm_leaflet', 'gm_leaflet_overlay_layers', $layer_name);
   } else {
-    return ctools_get_plugins('gm_leaflet', 'overlay_layers');
+    return ctools_get_plugins('gm_leaflet', 'gm_leaflet_overlay_layers');
   }
 }
 
@@ -140,13 +140,13 @@ function gm_leaflet_library() {
   return $libraries;
 }
 
-function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $width = '400px') {
+function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $width = '400px', $overlay_arguments = array()) {
   drupal_add_library('gm_leaflet', 'leaflet');
 
   $map = gm_leaflet_get_maps($map_name);
   $map_id = $map_id ? $map_id : $map_name;
   $map['id'] = $map_id;
-  _gm_leaflet_prepare_maps_plugin($map);
+  _gm_leaflet_prepare_maps_plugin($map, $overlay_arguments);
   $map['baseLayerCount'] = count($map['base layers']);
   $map['overlayLayerCount'] = count($map['overlay layers']);
 
@@ -161,8 +161,10 @@ function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $widt
 
 /**
  * Populates base layer and overlay layer properties with their related plugins data.
+ *
+ * @param $overlay_arguments may provide an array of arguments to pass to an overlay data callback keyed by the overlay name the arguments apply to.
  */
-function _gm_leaflet_prepare_maps_plugin(&$map) {
+function _gm_leaflet_prepare_maps_plugin(&$map, $overlay_arguments = array()) {
   $layers = $map['base layers'];
   $map['base layers'] = array();
 
@@ -175,11 +177,12 @@ function _gm_leaflet_prepare_maps_plugin(&$map) {
   $map['overlay layers'] = array();
 
   foreach ($layers as $key => $layer) {
+    $arguments = isset($overlay_arguments[$layer]) ? $overlay_arguments[$layer] : array();
     $plugin = gm_leaflet_get_overlay_layers($layer);
     $map['overlay layers'][$layer] = $plugin;
 
     $callback = ctools_plugin_get_function($plugin, 'data callback');
-    $data = $callback();
+    $data = call_user_func_array($callback, $arguments);
     $map['overlay layers'][$layer]['data'] = $data;
   }
 }
