@@ -30,6 +30,8 @@
 
         if (layerSettings.type == 'tile layer') {
           layer = gmLeafletAddTileLayer(name, layerSettings);
+        } else if (layerSettings.type == 'wms') {
+          layer = gmLeafletAddWMS(name, layerSettings);
         }
 
         if (mapSettings.baseLayerCount == 1 || mapSettings['default base layer'] == name) {
@@ -62,47 +64,53 @@
     }
   };
 
-function gmLeafletAddTileLayer(name, layerSettings) {
-  var layer = L.tileLayer(layerSettings['url template'], layerSettings.settings);
+  function gmLeafletAddTileLayer(name, layerSettings) {
+    var layer = new L.TileLayer(layerSettings['url template'], layerSettings.settings);
 
-  return layer;
-}
+    return layer;
+  }
 
-function gmLeafletAddGeoJSONLayer(layerName, layerSettings, layer) {
-  $.each(layerSettings.data.features, function(i, featureSettings) {
-    var geom;
+  function gmLeafletAddWMS(name, layerSettings) {
+    var layer = new L.TileLayer.WMS(layerSettings.url, layerSettings.settings);
 
-    // @todo Add conditions for object and file.
-    if (layerSettings.format == 'text') {
-      geom = JSON.parse(featureSettings.data);
-    };
-    markerOptions = {
-      radius: 5,
-      fillColor: '#03f',
-      color: '#03f',
-      weight: 5,
-      opacity: 0.5,
-      fillOpacity: 0.2
-    };
+    return layer;
+  }
 
-    if (featureSettings.settings.style && featureSettings.settings.style.color) {
-      markerOptions.fillColor = featureSettings.settings.style.color;
-      markerOptions.color = featureSettings.settings.style.color;
-    }
+  function gmLeafletAddGeoJSONLayer(layerName, layerSettings, layer) {
+    $.each(layerSettings.data.features, function(i, featureSettings) {
+      var geom;
 
-    jsonOptions = {
-      pointToLayer: function (feature, latlng) {
-        return L.circleMarker(latlng, markerOptions);
+      // @todo Add conditions for object and file.
+      if (layerSettings.format == 'text') {
+        geom = JSON.parse(featureSettings.data);
+      };
+      markerOptions = {
+        radius: 5,
+        fillColor: '#03f',
+        color: '#03f',
+        weight: 5,
+        opacity: 0.5,
+        fillOpacity: 0.2
+      };
+
+      if (featureSettings.settings.style && featureSettings.settings.style.color) {
+        markerOptions.fillColor = featureSettings.settings.style.color;
+        markerOptions.color = featureSettings.settings.style.color;
       }
-    };
-    $.extend(jsonOptions, featureSettings.settings);
 
-    var feature = new L.GeoJSON(geom, jsonOptions);
-    if (featureSettings.popup) {
-      feature.bindPopup(featureSettings.popup);
-    }
-    layer.addLayer(feature);
-  });
-}
+      jsonOptions = {
+        pointToLayer: function (feature, latlng) {
+          return L.circleMarker(latlng, markerOptions);
+        }
+      };
+      $.extend(jsonOptions, featureSettings.settings);
+
+      var feature = new L.GeoJSON(geom, jsonOptions);
+      if (featureSettings.popup) {
+        feature.bindPopup(featureSettings.popup);
+      }
+      layer.addLayer(feature);
+    });
+  }
 
 })(jQuery);
