@@ -7,7 +7,15 @@
       var mapSettings = Drupal.settings.gm_leaflet.map;
 
       // Create Map
-      var map = L.map(mapSettings.id, mapSettings.settings);
+      mapOptions = {
+        //zoomControl: false
+      }
+      $.extend(mapOptions, mapSettings.settings);
+
+      var map = L.map(mapSettings.id, mapOptions);
+      //var map = L.map(mapSettings.id, mapOptions);
+      //var zoomFS = new L.Control.ZoomFS();
+      //map.addControl(zoomFS);
 
       if (mapSettings.zoomToLayer) {
         if (mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.boundingBox) {

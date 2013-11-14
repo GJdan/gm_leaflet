@@ -74,64 +74,92 @@ function gm_leaflet_get_overlay_layers($layer_name = '') {
 }
 
 /**
- * Implements hook_library().
- * Provide basic plugins predicted to be desired in all/most maps.
- *
- * @todo Each library should have an entry in hook_requirements to ensure if the library exists and perhaps link to where to download it.
+ * Implements hook_libraries_info().
  */
-function gm_leaflet_library() {
+function gm_leaflet_libraries_info() {
   $libraries = array();
 
-  $path = libraries_get_path('leaflet');
   $libraries['leaflet'] = array(
-    'title' => 'Leaflet Mapping API',
-    'version' => '0.5.1',
-    'js' => array(
-      array(
-        'type' => 'file',
-        'data' => $path . "/dist/leaflet.js",
-        'group' => JS_LIBRARY,
-        'preprocess' => FALSE,
-      ),
+    'name' => 'Leaflet Mapping API',
+    'vendor url' => 'http://leafletjs.com',
+    'download url' => 'http://leaflet-cdn.s3.amazonaws.com/build/leaflet-0.5.1.zip',
+    'path' => 'dist',
+    'version arguments' => array(
+      'file' => 'dist/leaflet-src.js',
+      'pattern' => '@L\.version\s*=\s*[\'\"]([\d\.]+)[\'\"]@',
+      'lines' => 40,
     ),
-    'css' => array(
-      $path . "/dist/leaflet.css" => array(
-        'type' => 'file',
-        'media' => 'screen',
+    'files' => array(
+      'js' => array(
+        'leaflet.js' => array(
+          'type' => 'file',
+          'group' => JS_LIBRARY,
+          'preprocess' => FALSE,
+        ),
       ),
-      $path . "/dist/leaflet.ie.css" => array(
-        'browsers' => array(
-          'IE' => 'lte IE 8',
-          '!IE' => FALSE,
+      'css' => array(
+        "leaflet.css" => array(
+          'type' => 'file',
+          'media' => 'screen',
+        ),
+        "leaflet.ie.css" => array(
+          'browsers' => array(
+            'IE' => 'lte IE 8',
+            '!IE' => FALSE,
+          ),
         ),
       ),
     ),
   );
 
-  $libraries['leaflet_markercluster'] = array(
-    'title' => 'Leaflet Markercluster',
-    'version' => 0, // we don't have a version
-    'js' => array(
-      array(
-        'type' => 'file',
-        'data' => libraries_get_path('leaflet_markercluster') . "/dist/leaflet.markercluster.js",
-        'group' => JS_LIBRARY,
-        'preprocess' => FALSE,
+  $libraries['leaflet.zoomfs'] = array(
+    'name' => 'Leaflet Fullscreen Button',
+    'vendor url' => 'elidupuis.github.io/leaflet.zoomfs/',
+    'download url' => 'elidupuis.github.io/leaflet.zoomfs/',
+    'version' => 'master',
+    'files' => array(
+      'js' => array(
+        'leaflet.zoomfs.js' => array(
+          'type' => 'file',
+          'group' => JS_LIBRARY,
+          'preprocess' => FALSE,
+        ),
       ),
     ),
-    'css' => array(
-      libraries_get_path('leaflet_markercluster') . "/dist/MarkerCluster.css" => array(
-        'type' => 'file',
-        'media' => 'screen',
+    'dependencies' => array('leaflet'),
+  );
+
+  $libraries['Leaflet.markercluster'] = array(
+    'name' => 'Leaflet Markercluster',
+    'vendor url' => 'https://github.com/Leaflet/Leaflet.markercluster',
+    'download url' => 'https://github.com/Leaflet/Leaflet.markercluster/archive/0.2.zip',
+    'path' => 'dist',
+    'version arguments' => array(
+      'file' => 'CHANGELOG.md',
+      'pattern' => '@[\s#]*([\d\.]+)\s*\(\d{4}-\d{2}-\d{2}\)@',
+    ),
+    'files' => array(
+      'js' => array(
+        'leaflet.markercluster.js' => array(
+          'type' => 'file',
+          'group' => JS_LIBRARY,
+          'preprocess' => FALSE,
+        ),
       ),
-      libraries_get_path('leaflet_markercluster') . "/dist/MarkerCluster.Default.css" => array(
-        'type' => 'file',
-        'media' => 'screen',
-      ),
-      libraries_get_path('leaflet_markercluster') . "/dist/MarkerCluster.Default.ie.css" => array(
-        'browsers' => array(
-          'IE' => 'lte IE 8',
-          '!IE' => FALSE,
+      'css' => array(
+        "MarkerCluster.css" => array(
+          'type' => 'file',
+          'media' => 'screen',
+        ),
+        "MarkerCluster.Default.css" => array(
+          'type' => 'file',
+          'media' => 'screen',
+        ),
+        "MarkerCluster.Default.ie.css" => array(
+          'browsers' => array(
+            'IE' => 'lte IE 8',
+            '!IE' => FALSE,
+          ),
         ),
       ),
     ),
@@ -140,9 +168,7 @@ function gm_leaflet_library() {
   return $libraries;
 }
 
-function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $width = '400px', $overlay_arguments = array()) {
-  drupal_add_library('gm_leaflet', 'leaflet');
-
+function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $width = 'auto', $overlay_arguments = array()) {
   $map = gm_leaflet_get_maps($map_name);
   $map_id = $map_id ? $map_id : $map_name;
   $map['id'] = $map_id;
@@ -155,7 +181,10 @@ function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $widt
 
   return array(
     '#type' => 'markup',
-    '#markup' => '<div id="' . $map_id . '" style="height: ' . $height . '; width: ' . $width . ';" ></div>'
+    '#markup' => '<div id="' . $map_id . '" style="height: ' . $height . '; width: ' . $width . ';" ></div>',
+    '#attached' => array(
+      'libraries_load' => array(array('leaflet'), array('leaflet.zoomfs')),
+    ),
   );
 }
 
