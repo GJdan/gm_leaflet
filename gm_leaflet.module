@@ -127,6 +127,9 @@ function gm_leaflet_libraries_info() {
       ),
     ),
     'dependencies' => array('leaflet'),
+    'callbacks' => array(
+      'post-load' => array('gm_leaflet_libraries_zoomfs_post_load'),
+    ),
   );
 
   $libraries['Leaflet.markercluster'] = array(
@@ -168,6 +171,14 @@ function gm_leaflet_libraries_info() {
   return $libraries;
 }
 
+/**
+ * A post-load callback for the leaflet.zoomfs library
+ */
+function gm_leaflet_libraries_zoomfs_post_load($library, $version, $variant) {
+  // I'm not sure if I can add this to the css property of its library entry since this css file is stored with this module, and not with the library.
+  drupal_add_css(drupal_get_path('module', 'gm_leaflet') . '/gm_leaflet-leaflet.zoomfs.css');
+}
+
 function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $width = 'auto', $overlay_arguments = array()) {
   $map = gm_leaflet_get_maps($map_name);
   $map_id = $map_id ? $map_id : $map_name;
@@ -175,6 +186,8 @@ function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $widt
   _gm_leaflet_prepare_maps_plugin($map, $overlay_arguments);
   $map['baseLayerCount'] = count($map['base layers']);
   $map['overlayLayerCount'] = count($map['overlay layers']);
+  $map['height'] = $height;
+  $map['width'] = $width;
 
   drupal_add_js(array('gm_leaflet' => array('map' => $map)), 'setting');  // Add map plugin to the drupal settings js object.
   drupal_add_js(drupal_get_path('module', 'gm_leaflet') . '/js/gm_leaflet.map.js');

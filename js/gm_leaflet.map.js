@@ -8,14 +8,13 @@
 
       // Create Map
       mapOptions = {
-        //zoomControl: false
+        zoomControl: false
       }
       $.extend(mapOptions, mapSettings.settings);
 
       var map = L.map(mapSettings.id, mapOptions);
-      //var map = L.map(mapSettings.id, mapOptions);
-      //var zoomFS = new L.Control.ZoomFS();
-      //map.addControl(zoomFS);
+      var zoomFS = new L.Control.ZoomFS();
+      map.addControl(zoomFS);
 
       if (mapSettings.zoomToLayer) {
         if (mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.boundingBox) {
@@ -69,6 +68,12 @@
       });
 
       L.control.layers(baseLayers, overlayLayers).addTo(map);
+
+      // Event listeners...
+      map.on('exitFullscreen', function () { // Restore map dimensions when exiting fullscreen mode.
+        $('#' + mapSettings.id).css('height', mapSettings.height);
+        $('#' + mapSettings.id).css('width', mapSettings.width);
+      });
     }
   };
 
