@@ -3,77 +3,84 @@
   Drupal.behaviors.gm_leafletMap = {
     attach: function (context, settings) {
 
-      // Fetch settings
-      var mapSettings = Drupal.settings.gm_leaflet.map;
+      $.each(settings.gm_leaflet, function(mapID, mapSettings) {
+        // Fetch settings
+        //var mapSettings = Drupal.settings.gm_leaflet.map;
 
-      // Create Map
-      mapOptions = {
-        zoomControl: false
-      }
-      $.extend(mapOptions, mapSettings.settings);
-
-      var map = L.map(mapSettings.id, mapOptions);
-      var zoomFS = new L.Control.ZoomFS();
-      map.addControl(zoomFS);
-
-      if (mapSettings.zoomToLayer) {
-        if (mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.boundingBox) {
-          bBox = mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.boundingBox;
-          map.fitBounds([[bBox.miny, bBox.minx], [bBox.maxy, bBox.maxx]]);
-        } else if (mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.centroid) {
-          view = mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView
-          map.setView([view.centroid.lat, view.centroid.lon], view.zoom);
+        // Create Map
+        mapOptions = {
+          zoomControl: false
         }
-      } else {
-        map.setView([mapSettings.lat, mapSettings.lon], mapSettings.zoom);
-      }
+        $.extend(mapOptions, mapSettings.settings);
 
-      var baseLayers = {};
-      var overlayLayers = {};
+        var map = L.map(mapSettings.id, mapOptions);
+        var zoomFS = new L.Control.ZoomFS();
+        map.addControl(zoomFS);
 
-      // Add base layers
-      $.each(mapSettings['base layers'], function(name, layerSettings) {
-        var layer;
-
-        if (layerSettings.type == 'tile layer') {
-          layer = gmLeafletAddTileLayer(name, layerSettings);
-        } else if (layerSettings.type == 'wms') {
-          layer = gmLeafletAddWMS(name, layerSettings);
+        if (mapSettings.zoomToLayer) {
+          if (mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.boundingBox) {
+            bBox = mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.boundingBox;
+            map.fitBounds([[bBox.miny, bBox.minx], [bBox.maxy, bBox.maxx]]);
+          } else if (mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.centroid) {
+            view = mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView
+            map.setView([view.centroid.lat, view.centroid.lon], view.zoom);
+          }
+        } else {
+          map.setView([mapSettings.lat, mapSettings.lon], mapSettings.zoom);
         }
 
-        if (mapSettings.baseLayerCount == 1 || mapSettings['default base layer'] == name) {
-          layer.addTo(map);
-        }
+        var baseLayers = {};
+        var overlayLayers = {};
 
-        if (mapSettings.baseLayerCount > 1) {
-          baseLayers[layerSettings.name] = layer;
-        }
-      });
+        // Add base layers
+        $.each(mapSettings['base layers'], function(name, layerSettings) {
+          var layer;
 
-      // Add overlay layers
-      $.each(mapSettings['overlay layers'], function(name, layerSettings) {
-        var layer = L.featureGroup();
+          if (layerSettings.type == 'tile layer') {
+            layer = gmLeafletAddTileLayer(name, layerSettings);
+          } else if (layerSettings.type == 'wms') {
+            layer = gmLeafletAddWMS(name, layerSettings);
+          }
 
-        // If the data is GeoJSON we may have to prepare it for the leaflet constructor...
-        if (layerSettings.type == 'GeoJSON') {
-          gmLeafletAddGeoJSONLayer(name, layerSettings, layer);
-        }
+          if (mapSettings.baseLayerCount == 1 || mapSettings['default base layer'] == name) {
+            layer.addTo(map);
+          }
 
-        if (!mapSettings['enabled overlay layers'] || $.inArray(name, mapSettings['enabled overlay layers']) != -1) {
-          layer.addTo(map);
-        }
-        if (!mapSettings['switcher overlay layers'] || $.inArray(name, mapSettings['switcher overlay layers']) != -1) {
-          overlayLayers[layerSettings.name] = layer;
-        }
-      });
+          if (mapSettings.baseLayerCount > 1) {
+            baseLayers[layerSettings.name] = layer;
+          }
+        });
 
-      L.control.layers(baseLayers, overlayLayers).addTo(map);
+        // Add overlay layers
+        $.each(mapSettings['overlay layers'], function(name, layerSettings) {
+          var layer = L.featureGroup();
 
-      // Event listeners...
-      map.on('exitFullscreen', function () { // Restore map dimensions when exiting fullscreen mode.
-        $('#' + mapSettings.id).css('height', mapSettings.height);
-        $('#' + mapSettings.id).css('width', mapSettings.width);
-      });
+          // If the data is GeoJSON we may have to prepare it for the leaflet constructor...
+          if (layerSettings.type == 'GeoJSON') {
+            gmLeafletAddGeoJSONLayer(name, layerSettings, layer);
+          }
+
+          if (!mapSettings['enabled overlay layers'] || $.inArray(name, mapSettings['enabled overlay layers']) != -1) {
+            layer.addTo(map);
+          }
+          if (!mapSettings['switcher overlay layers'] || $.inArray(name, mapSettings['switcher overlay layers']) != -1) {
+            overlayLayers[layerSettings.name] = layer;
+          }
+        });
+
+        L.control.layers(baseLayers, overlayLayers).addTo(map);
+
+        // Event listeners...
+        map.on('enterFullscreen', function () { // Ensure that the fullscreen map appears on top of everything else.
+          $('#' + mapID).css('z-index', 1000);
+        });
+        map.on('exitFullscreen', function () { // Restore map dimensions and z-index when exiting fullscreen mode.
+          $('#' + mapID).css('height', mapSettings.height);
+          $('#' + mapID).css('width', mapSettings.width);
+          $('#' + mapID).css('z-index', 0);
+        });
+
+      }); // End of loop through maps
     }
   };
 

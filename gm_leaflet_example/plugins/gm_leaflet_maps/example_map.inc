@@ -2,6 +2,8 @@
 /**
  * @file
  * example_map.inc
+ *
+ * @todo add zoomToLayer example.
  */
 
 $plugin = array(
@@ -15,4 +17,5 @@ $plugin = array(
   'lat' => 54.9, //Required
   'lon' => -128, //Required
   'zoom' => 4, //Required
+  //'zoomToLayer' => 'example_data', // However if this is provided it will override the above three values, but requires the given layer to provide info for how to zoom.
 );

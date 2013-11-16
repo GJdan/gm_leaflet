@@ -179,6 +179,17 @@ function gm_leaflet_libraries_zoomfs_post_load($library, $version, $variant) {
   drupal_add_css(drupal_get_path('module', 'gm_leaflet') . '/gm_leaflet-leaflet.zoomfs.css');
 }
 
+/**
+ * Function for rendering a leaflet map.
+ *
+ * @return A renderable array to be returned directly by many drupal functions, or converted into html with drupal_render().
+ *
+ * @param string $map_name The name of the gm_leaflet_map to render
+ * @param string $map_id HTML ID of the map div.  Must be unique within the page this is rendered on.
+ * @param string $height The desired height of the div containing the map formatted for the css property 'height'.  Defaults to '400px'.
+ * @param string $width The desired width of the div containing the map formatted for the css property 'width'.  Defaults to 'auto'.
+ * $param array $overlay_arguments An array, keyed by overlay layer's names, of arrays of arguments to pass to the data callback for overlay layers that require parameters be passed to their callbacks..
+ */
 function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $width = 'auto', $overlay_arguments = array()) {
   $map = gm_leaflet_get_maps($map_name);
   $map_id = $map_id ? $map_id : $map_name;
@@ -189,7 +200,7 @@ function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $widt
   $map['height'] = $height;
   $map['width'] = $width;
 
-  drupal_add_js(array('gm_leaflet' => array('map' => $map)), 'setting');  // Add map plugin to the drupal settings js object.
+  drupal_add_js(array('gm_leaflet' => array($map_id => $map)), 'setting');  // Add map plugin to the drupal settings js object.
   drupal_add_js(drupal_get_path('module', 'gm_leaflet') . '/js/gm_leaflet.map.js');
 
   return array(
