@@ -72,7 +72,7 @@
 
         // Event listeners...
         map.on('enterFullscreen', function () { // Ensure that the fullscreen map appears on top of everything else.
-          $('#' + mapID).css('z-index', 1000);
+          $('#' + mapID).css('z-index', 2000);
         });
         map.on('exitFullscreen', function () { // Restore map dimensions and z-index when exiting fullscreen mode.
           $('#' + mapID).css('height', mapSettings.height);
