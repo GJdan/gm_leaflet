@@ -234,8 +234,10 @@ function _gm_leaflet_prepare_maps_plugin(&$map, $overlay_arguments = array()) {
     $plugin = gm_leaflet_get_overlay_layers($layer);
     $map['overlay layers'][$layer] = $plugin;
 
+    if ($plugin['type'] != 'wms') {
     $callback = ctools_plugin_get_function($plugin, 'data callback');
     $data = call_user_func_array($callback, $arguments);
     $map['overlay layers'][$layer]['data'] = $data;
+    }
   }
 }

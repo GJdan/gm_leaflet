@@ -58,6 +58,8 @@
           // If the data is GeoJSON we may have to prepare it for the leaflet constructor...
           if (layerSettings.type == 'GeoJSON') {
             gmLeafletAddGeoJSONLayer(name, layerSettings, layer);
+          } else if (layerSettings.type == 'wms') {
+            layer = gmLeafletAddWMS(name, layerSettings);
           }
 
           if (!mapSettings['enabled overlay layers'] || $.inArray(name, mapSettings['enabled overlay layers']) != -1) {
