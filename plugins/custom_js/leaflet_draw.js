@@ -7,16 +7,18 @@
     drawnItems.addTo(map);
     layerSwitcher.addOverlay(drawnItems, 'Drawn Items');
 
-    var geoJSON = JSON.parse($.cookie(cookieName));
-    if (geoJSON) {
-      geoJSONLayer = new L.geoJson(geoJSON, {
-        onEachFeature: function(featureData, layer) {
-          drawnItems.addLayer(layer);
-        }
-      });
+    if ($.cookie(cookieName)) {
+      var geoJSON = JSON.parse($.cookie(cookieName));
+      if (geoJSON) {
+        geoJSONLayer = new L.geoJson(geoJSON, {
+          onEachFeature: function(featureData, layer) {
+            drawnItems.addLayer(layer);
+          }
+        });
 
-      $bounds = drawnItems.getBounds();
-      map.fitBounds($bounds);
+        $bounds = drawnItems.getBounds();
+        map.fitBounds($bounds);
+      }
     }
 
     // Initialize the draw control and pass it the FeatureGroup of editable layers
