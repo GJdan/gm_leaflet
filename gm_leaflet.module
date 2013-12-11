@@ -27,6 +27,7 @@ function gm_leaflet_ctools_plugin_type() {
     'defaults' => array(
       'base layers' => array(),
       'overlay layers' => array(),
+      'custom_js' => array(),
       'settings' => array(),
     ),
   );
@@ -70,6 +71,15 @@ function gm_leaflet_get_overlay_layers($layer_name = '') {
     return ctools_get_plugins('gm_leaflet', 'overlay_layers', $layer_name);
   } else {
     return ctools_get_plugins('gm_leaflet', 'overlay_layers');
+  }
+}
+
+function gm_leaflet_get_custom_js($plugin_name = '') {
+  ctools_include('plugins');
+  if ($plugin_name) {
+    return ctools_get_plugins('gm_leaflet', 'custom_js', $plugin_name);
+  } else {
+    return ctools_get_plugins('gm_leaflet', 'custom_js');
   }
 }
 
@@ -268,9 +278,18 @@ function _gm_leaflet_prepare_maps_plugin(&$map, $overlay_arguments = array()) {
     $map['overlay layers'][$layer] = $plugin;
 
     if ($plugin['type'] != 'wms') {
-    $callback = ctools_plugin_get_function($plugin, 'data callback');
-    $data = call_user_func_array($callback, $arguments);
-    $map['overlay layers'][$layer]['data'] = $data;
+      $callback = ctools_plugin_get_function($plugin, 'data callback');
+      $data = call_user_func_array($callback, $arguments);
+      $map['overlay layers'][$layer]['data'] = $data;
     }
+  }
+
+  $custom_js = $map['custom_js'];
+  $map['custom_js'] = array();
+  foreach ($custom_js as $key => $plugin_name) {
+    $plugin = gm_leaflet_get_custom_js($plugin_name);
+    $js_path = isset($plugin['js_path']) ? $plugin['js_path'] : $plugin['path'];
+    drupal_add_js($js_path . '/' . $plugin['js_file']);
+    $map['custom_js'][$plugin_name] = $plugin;
   }
 }

@@ -4,9 +4,6 @@
     attach: function (context, settings) {
 
       $.each(settings.gm_leaflet, function(mapID, mapSettings) {
-        // Fetch settings
-        //var mapSettings = Drupal.settings.gm_leaflet.map;
-
         // Create Map
         mapOptions = {
           zoomControl: false
@@ -80,6 +77,12 @@
           $('#' + mapID).css('height', mapSettings.height);
           $('#' + mapID).css('width', mapSettings.width);
           $('#' + mapID).css('z-index', 0);
+        });
+
+        // Add custom js
+        $.each(mapSettings['custom_js'], function(name, customjs) {
+          // The callback has been added to the drupal object.
+          Drupal[customjs["callback"]](map, mapSettings, customjs); // Every customjs plugin is passed the map, the mapSettings object, and its own settings.
         });
 
       }); // End of loop through maps
