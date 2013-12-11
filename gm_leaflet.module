@@ -23,24 +23,24 @@ function gm_leaflet_ctools_plugin_directory($module, $plugin) {
 function gm_leaflet_ctools_plugin_type() {
   $plugins = array();
 
-  $plugins['gm_leaflet_maps'] = array(
+  $plugins['maps'] = array(
     'defaults' => array(
       'base layers' => array(),
       'overlay layers' => array(),
       'settings' => array(),
     ),
   );
-  $plugins['gm_leaflet_base_layers'] = array(
+  $plugins['base_layers'] = array(
     'defaults' => array(
       'settings' => array(),
     ),
   );
-  $plugins['gm_leaflet_overlay_layers'] = array(
+  $plugins['overlay_layers'] = array(
     'defaults' => array(
       'settings' => array(),
     ),
   );
-  $plugins['custom'] = array(); // This plugin type is for adding arbitrary javascript to a map.  Can be used to add literally anything that isn't covered by the previous plugins.
+  $plugins['custom_js'] = array(); // This plugin type is for adding arbitrary javascript to a map.  Can be used to add literally anything that isn't covered by the previous plugins.
 
   return $plugins;
 }
@@ -49,27 +49,27 @@ function gm_leaflet_get_maps($map_name = '') {
   ctools_include('plugins');
 
   if ($map_name) {
-    return ctools_get_plugins('gm_leaflet', 'gm_leaflet_maps', $map_name);
+    return ctools_get_plugins('gm_leaflet', 'maps', $map_name);
   } else {
-    return ctools_get_plugins('gm_leaflet', 'gm_leaflet_maps');
+    return ctools_get_plugins('gm_leaflet', 'maps');
   }
 }
 
 function gm_leaflet_get_base_layers($layer_name = '') {
   ctools_include('plugins');
   if ($layer_name) {
-    return ctools_get_plugins('gm_leaflet', 'gm_leaflet_base_layers', $layer_name);
+    return ctools_get_plugins('gm_leaflet', 'base_layers', $layer_name);
   } else {
-    return ctools_get_plugins('gm_leaflet', 'gm_leaflet_base_layers');
+    return ctools_get_plugins('gm_leaflet', 'base_layers');
   }
 }
 
 function gm_leaflet_get_overlay_layers($layer_name = '') {
   ctools_include('plugins');
   if ($layer_name) {
-    return ctools_get_plugins('gm_leaflet', 'gm_leaflet_overlay_layers', $layer_name);
+    return ctools_get_plugins('gm_leaflet', 'overlay_layers', $layer_name);
   } else {
-    return ctools_get_plugins('gm_leaflet', 'gm_leaflet_overlay_layers');
+    return ctools_get_plugins('gm_leaflet', 'overlay_layers');
   }
 }
 
