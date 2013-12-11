@@ -83,9 +83,8 @@ function gm_leaflet_libraries_info() {
     'name' => 'Leaflet Mapping API',
     'vendor url' => 'http://leafletjs.com',
     'download url' => 'http://leaflet-cdn.s3.amazonaws.com/build/leaflet-0.5.1.zip',
-    'path' => 'dist',
     'version arguments' => array(
-      'file' => 'dist/leaflet-src.js',
+      'file' => 'leaflet-src.js',
       'pattern' => '@L\.version\s*=\s*[\'\"]([\d\.]+)[\'\"]@',
       'lines' => 40,
     ),
@@ -115,7 +114,7 @@ function gm_leaflet_libraries_info() {
   $libraries['leaflet.zoomfs'] = array(
     'name' => 'Leaflet Fullscreen Button',
     'vendor url' => 'elidupuis.github.io/leaflet.zoomfs/',
-    'download url' => 'elidupuis.github.io/leaflet.zoomfs/',
+    'download url' => 'https://github.com/elidupuis/leaflet.zoomfs/tarball/master',
     'version' => 'master',
     'files' => array(
       'js' => array(
@@ -166,6 +165,40 @@ function gm_leaflet_libraries_info() {
         ),
       ),
     ),
+  );
+
+  $libraries['Leaflet.draw'] = array(
+    'name' => 'Leaflet.draw',
+    'vendor url' => 'https://github.com/Leaflet/Leaflet.draw/tree/0.2.2',
+    'download url' => 'https://github.com/Leaflet/Leaflet.draw/archive/0.2.2.tar.gz',
+    'path' => 'dist',
+    'version arguments' => array(
+      'file' => 'dist/leaflet.draw-src.js',
+      'pattern' => "@L.drawVersion\s*=\s*[\'\"]([\d\.]+)[\'\"]@",
+      'lines' => 40,
+    ),
+    'files' => array(
+      'js' => array(
+        'leaflet.draw.js' => array(
+          'type' => 'file',
+          'group' => JS_LIBRARY,
+          'preprocess' => FALSE,
+        ),
+      ),
+      'css' => array(
+        'leaflet.draw.css' => array(
+          'type' => 'file',
+          'media' => 'screen',
+        ),
+        'leaflet.draw.ie.css' => array(
+          'browsers' => array(
+            'IE' => 'lte IE 8',
+            '!IE' => FALSE,
+          ),
+        ),
+      ),
+    ),
+    'dependencies' => array('leaflet (>=0.6.0)'),
   );
 
   return $libraries;
