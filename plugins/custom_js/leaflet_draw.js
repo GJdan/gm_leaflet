@@ -14,6 +14,9 @@
           drawnItems.addLayer(layer);
         }
       });
+
+      $bounds = drawnItems.getBounds();
+      map.fitBounds($bounds);
     }
 
     // Initialize the draw control and pass it the FeatureGroup of editable layers
