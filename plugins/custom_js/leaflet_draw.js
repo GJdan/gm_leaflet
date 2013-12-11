@@ -1,10 +1,11 @@
 (function($) {
-  Drupal.gmLeafletDraw = function(map, settings, drawSettings) {
+  Drupal.gmLeafletDraw = function(map, settings, drawSettings, layerSwitcher) {
     cookieName = "gm_leaflet_draw_" + settings.id;
 
     // Initialize the FeatureGroup to store editable layers
     var drawnItems = new L.FeatureGroup();
     drawnItems.addTo(map);
+    layerSwitcher.addOverlay(drawnItems, 'Drawn Items');
 
     var geoJSON = JSON.parse($.cookie(cookieName));
     if (geoJSON) {
@@ -54,9 +55,13 @@
       geoJSON = drawnItems.toGeoJSON();
       $.cookie(cookieName, JSON.stringify(geoJSON));
     });
-
     map.on('draw:edited', function(e) {
-      layers = e.layers;
+      //layers = e.layers;
+      geoJSON = drawnItems.toGeoJSON();
+      $.cookie(cookieName, JSON.stringify(geoJSON));
+    });
+    map.on('draw:deleted', function(e) {
+      //layers = e.layers;
       geoJSON = drawnItems.toGeoJSON();
       $.cookie(cookieName, JSON.stringify(geoJSON));
     });

@@ -67,7 +67,8 @@
           }
         });
 
-        L.control.layers(baseLayers, overlayLayers).addTo(map);
+        layerSwitcher = L.control.layers(baseLayers, overlayLayers);
+        layerSwitcher.addTo(map);
 
         // Event listeners...
         map.on('enterFullscreen', function () { // Ensure that the fullscreen map appears on top of everything else.
@@ -82,7 +83,7 @@
         // Add custom js
         $.each(mapSettings['custom_js'], function(name, customjs) {
           // The callback has been added to the drupal object.
-          Drupal[customjs["callback"]](map, mapSettings, customjs); // Every customjs plugin is passed the map, the mapSettings object, and its own settings.
+          Drupal[customjs["callback"]](map, mapSettings, customjs, layerSwitcher); // Every customjs plugin is passed the map, the mapSettings object, and its own settings.
         });
 
       }); // End of loop through maps
