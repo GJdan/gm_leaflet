@@ -177,6 +177,25 @@ function gm_leaflet_libraries_info() {
     ),
   );
 
+  $libraries['jquery-cookie'] = array(
+    'name' => 'jQuery Cookie',
+    'vendar url' => 'https://github.com/carhartl/jquery-cookie',
+    'download url' => 'https://github.com/carhartl/jquery-cookie/archive/v1.4.0.tar.gz',
+    'version arguments' => array(
+      'file' => 'jquery.cookie.js',
+      'pattern' => '@v([\d\.]+)@',
+    ),
+    'files' => array(
+      'js' => array(
+        'jquery.cookie.js' => array(
+          'type' => 'file',
+          'group' => JS_LIBRARY,
+          'preprocess' => FALSE,
+        ),
+      ),
+    ),
+  );
+
   $libraries['Leaflet.draw'] = array(
     'name' => 'Leaflet.draw',
     'vendor url' => 'https://github.com/Leaflet/Leaflet.draw/tree/0.2.2',
@@ -208,7 +227,7 @@ function gm_leaflet_libraries_info() {
         ),
       ),
     ),
-    'dependencies' => array('leaflet (>=0.6.0)'),
+    'dependencies' => array('leaflet (>=0.6.0)', 'jquery-cookie'),
   );
 
   return $libraries;
