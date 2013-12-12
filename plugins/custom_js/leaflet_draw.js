@@ -18,7 +18,11 @@
 
         $bounds = drawnItems.getBounds();
         map.fitBounds($bounds);
+      } else {
+        map.setView([settings.lat, settings.lon], settings.zoom);
       }
+    } else {
+      map.setView([settings.lat, settings.lon], settings.zoom);
     }
 
     // Initialize the draw control and pass it the FeatureGroup of editable layers

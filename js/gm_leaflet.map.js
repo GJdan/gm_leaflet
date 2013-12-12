@@ -14,7 +14,7 @@
         var zoomFS = new L.Control.ZoomFS();
         map.addControl(zoomFS);
 
-        if (mapSettings.zoomToLayer) {
+        if (mapSettings.zoomToLayer && !mapSettings.noSetView) {
           if (mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.boundingBox) {
             bBox = mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.boundingBox;
             map.fitBounds([[bBox.miny, bBox.minx], [bBox.maxy, bBox.maxx]]);
@@ -22,7 +22,7 @@
             view = mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView
             map.setView([view.centroid.lat, view.centroid.lon], view.zoom);
           }
-        } else {
+        } else if (mapSettings.lat && mapSettings.lon && !mapSettings.noSetView) {
           map.setView([mapSettings.lat, mapSettings.lon], mapSettings.zoom);
         }
 
