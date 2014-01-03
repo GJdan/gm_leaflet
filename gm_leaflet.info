@@ -1,6 +1,6 @@
 name = GeoMemes Leaflet API
 description = A Leaflet Mapping API Implementation by GeoMemes Research Inc.
-core = 7.x
-version = 7.x-1.x-dev
+core = 6.x
+version = 6.x-1.x-dev
 dependencies[] = ctools
 dependencies[] = libraries

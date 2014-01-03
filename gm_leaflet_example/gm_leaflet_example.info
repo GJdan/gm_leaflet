@@ -1,4 +1,5 @@
 name = GeoMemes Leaflet API Example
 description = Examples to demonstrate how to use the GeoMemes Leaflet API
 dependencies[] = gm_leaflet
-core = 7.x
+core = 6.x
+version = 6.x-1.x-dev

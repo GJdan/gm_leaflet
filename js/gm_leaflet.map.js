@@ -1,7 +1,7 @@
 (function ($) {
 
-  Drupal.behaviors.gm_leafletMap = {
-    attach: function (context, settings) {
+  Drupal.behaviors.gm_leafletMap = function (context) {
+    settings = Drupal.settings;
 
       $.each(settings.gm_leaflet, function(mapID, mapSettings) {
         // Create Map
@@ -88,7 +88,6 @@
 
       }); // End of loop through maps
     }
-  };
 
   function gmLeafletAddTileLayer(name, layerSettings) {
     var layer = new L.TileLayer(layerSettings['url template'], layerSettings.settings);

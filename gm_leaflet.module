@@ -18,12 +18,10 @@ function gm_leaflet_ctools_plugin_directory($module, $plugin) {
 }
 
 /**
- * Implements hook_ctools_plugin_type()
+ * Implements hook_ctools_plugin_TYPE()
  */
-function gm_leaflet_ctools_plugin_type() {
-  $plugins = array();
-
-  $plugins['maps'] = array(
+function gm_leaflet_ctools_plugin_maps() {
+  return array(
     'defaults' => array(
       'base layers' => array(),
       'overlay layers' => array(),
@@ -31,19 +29,35 @@ function gm_leaflet_ctools_plugin_type() {
       'settings' => array(),
     ),
   );
-  $plugins['base_layers'] = array(
-    'defaults' => array(
-      'settings' => array(),
-    ),
-  );
-  $plugins['overlay_layers'] = array(
-    'defaults' => array(
-      'settings' => array(),
-    ),
-  );
-  $plugins['custom_js'] = array(); // This plugin type is for adding arbitrary javascript to a map.  Can be used to add literally anything that isn't covered by the previous plugins.
+}
 
-  return $plugins;
+/**
+ * Implements hook_ctools_plugin_TYPE()
+ */
+function gm_leaflet_ctools_plugin_base_layers() {
+  return array(
+    'defaults' => array(
+      'settings' => array(),
+    ),
+  );
+}
+
+/**
+ * Implements hook_ctools_plugin_TYPE()
+ */
+function gm_leaflet_ctools_plugin_overlay_layers() {
+  return array(
+    'defaults' => array(
+      'settings' => array(),
+    ),
+  );
+}
+
+/**
+ * Implements hook_ctools_plugin_TYPE()
+ */
+function gm_leaflet_ctools_plugin_custom_js() {
+  return array();
 }
 
 function gm_leaflet_get_maps($map_name = '') {
@@ -84,8 +98,11 @@ function gm_leaflet_get_custom_js($plugin_name = '') {
 }
 
 /**
- * Implements hook_libraries_info().
+ * Leaving this commented out here for now for the sake of information.
  */
+/**
+ * Implements hook_libraries_info().
+ *
 function gm_leaflet_libraries_info() {
   $libraries = array();
 
@@ -231,15 +248,15 @@ function gm_leaflet_libraries_info() {
   );
 
   return $libraries;
-}
+}/**/
 
 /**
  * A post-load callback for the leaflet.zoomfs library
  */
-function gm_leaflet_libraries_zoomfs_post_load($library, $version, $variant) {
+//function gm_leaflet_libraries_zoomfs_post_load($library, $version, $variant) {
   // I'm not sure if I can add this to the css property of its library entry since this css file is stored with this module, and not with the library.
-  drupal_add_css(drupal_get_path('module', 'gm_leaflet') . '/gm_leaflet-leaflet.zoomfs.css');
-}
+  //drupal_add_css(drupal_get_path('module', 'gm_leaflet') . '/gm_leaflet-leaflet.zoomfs.css');
+//}
 
 /**
  * Function for rendering a leaflet map.
@@ -253,6 +270,15 @@ function gm_leaflet_libraries_zoomfs_post_load($library, $version, $variant) {
  * $param array $overlay_arguments An array, keyed by overlay layer's names, of arrays of arguments to pass to the data callback for overlay layers that require parameters be passed to their callbacks..
  */
 function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $width = 'auto', $overlay_arguments = array()) {
+  if ($path = libraries_get_path('leaflet')) {
+    drupal_add_js($path . '/leaflet.js');
+    drupal_add_css($path . '/leaflet.css');
+  }
+  if ($path = libraries_get_path('leaflet.zoomfs')) {
+    drupal_add_js($path . '/leaflet.zoomfs.js');
+    drupal_add_css(drupal_get_path('module', 'gm_leaflet') . '/gm_leaflet-leaflet.zoomfs.css');
+  }
+
   $map = gm_leaflet_get_maps($map_name);
   $map_id = $map_id ? $map_id : $map_name;
   $map['id'] = $map_id;
@@ -265,13 +291,7 @@ function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $widt
   drupal_add_js(array('gm_leaflet' => array($map_id => $map)), 'setting');  // Add map plugin to the drupal settings js object.
   drupal_add_js(drupal_get_path('module', 'gm_leaflet') . '/js/gm_leaflet.map.js');
 
-  return array(
-    '#type' => 'markup',
-    '#markup' => '<div id="' . $map_id . '" style="height: ' . $height . '; width: ' . $width . ';" ></div>',
-    '#attached' => array(
-      'libraries_load' => array(array('leaflet'), array('leaflet.zoomfs')),
-    ),
-  );
+  return '<div id="' . $map_id . '" style="height: ' . $height . '; width: ' . $width . ';" ></div>';
 }
 
 /**
