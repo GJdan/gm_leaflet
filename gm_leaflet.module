@@ -297,9 +297,9 @@ function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $widt
 /**
  * Populates base layer and overlay layer properties with their related plugins data.
  *
- * @param $overlay_arguments may provide an array of arguments to pass to an overlay data callback keyed by the overlay name the arguments apply to.
+ * @param $callback_arguments may provide an array of arguments to pass to an overlay data callback keyed by the overlay name the arguments apply to.
  */
-function _gm_leaflet_prepare_maps_plugin(&$map, $overlay_arguments = array()) {
+function _gm_leaflet_prepare_maps_plugin(&$map, $callback_arguments = array()) {
   $layers = $map['base layers'];
   $map['base layers'] = array();
 
@@ -312,7 +312,7 @@ function _gm_leaflet_prepare_maps_plugin(&$map, $overlay_arguments = array()) {
   $map['overlay layers'] = array();
 
   foreach ($layers as $key => $layer) {
-    $arguments = isset($overlay_arguments[$layer]) ? $overlay_arguments[$layer] : array();
+    $arguments = isset($callback_arguments[$layer]) ? $callback_arguments[$layer] : array();
     $plugin = gm_leaflet_get_overlay_layers($layer);
     $map['overlay layers'][$layer] = $plugin;
 
@@ -326,9 +326,16 @@ function _gm_leaflet_prepare_maps_plugin(&$map, $overlay_arguments = array()) {
   $custom_js = $map['custom_js'];
   $map['custom_js'] = array();
   foreach ($custom_js as $key => $plugin_name) {
+    $arguments = isset($callback_arguments['custom_js'][$plugin_name]) ? $callback_arguments['custom_js'][$plugin_name] : array();
     $plugin = gm_leaflet_get_custom_js($plugin_name);
     $js_path = isset($plugin['js_path']) ? $plugin['js_path'] : $plugin['path'];
     drupal_add_js($js_path . '/' . $plugin['js_file']);
     $map['custom_js'][$plugin_name] = $plugin;
+
+    $callback = ctools_plugin_get_function($plugin, 'data callback');
+    if ($callback) {
+      $data = call_user_func_array($callback, $arguments);
+      $map['custom_js'][$plugin_name]['data'] = $data;
+    }
   }
 }
