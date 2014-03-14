@@ -1,6 +1,9 @@
 (function($) {
   Drupal.gmLeafletDraw = function(map, settings, drawSettings, layerSwitcher) {
     cookieName = "gm_leaflet_draw_" + settings.id;
+    if (Drupal.settings['gm_leaflet-leaflet_draw-cookieKey']) {
+      cookieName += '-' + Drupal.settings['gm_leaflet-leaflet_draw-cookieKey'];
+    }
 
     // Initialize the FeatureGroup to store editable layers
     var drawnItems = new L.FeatureGroup();
@@ -16,8 +19,13 @@
           }
         });
 
-        $bounds = drawnItems.getBounds();
-        map.fitBounds($bounds);
+        // It seems an empty collection can be passed at times.  Fallback to the default setView in that case.
+        if ((geoJSON.coordinates && geoJSON.coordinates.length > 0) || (geoJSON.geometries && geoJSON.geometries.length > 0) || (geoJSON.features && geoJSON.features.length > 0)) {
+          $bounds = drawnItems.getBounds();
+          map.fitBounds($bounds);
+        } else {
+          map.setView([settings.lat, settings.lon], settings.zoom);
+        }
       } else {
         map.setView([settings.lat, settings.lon], settings.zoom);
       }

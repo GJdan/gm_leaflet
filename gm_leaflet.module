@@ -254,13 +254,13 @@ function gm_leaflet_libraries_zoomfs_post_load($library, $version, $variant) {
  * @param string $map_id HTML ID of the map div.  Must be unique within the page this is rendered on.
  * @param string $height The desired height of the div containing the map formatted for the css property 'height'.  Defaults to '400px'.
  * @param string $width The desired width of the div containing the map formatted for the css property 'width'.  Defaults to 'auto'.
- * $param array $overlay_arguments An array, keyed by overlay layer's names, of arrays of arguments to pass to the data callback for overlay layers that require parameters be passed to their callbacks..
+ * $param array $overlay_arguments An array, keyed by plugin type and layer names, of arrays of arguments to pass to the data callback for overlay layers that require parameters be passed to their callbacks..
  */
-function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $width = 'auto', $overlay_arguments = array()) {
+function gm_leaflet_render_map($map_name, $map_id = '', $height = '400px', $width = 'auto', $callback_arguments = array()) {
   $map = gm_leaflet_get_maps($map_name);
   $map_id = $map_id ? $map_id : $map_name;
   $map['id'] = $map_id;
-  _gm_leaflet_prepare_maps_plugin($map, $overlay_arguments);
+  _gm_leaflet_prepare_maps_plugin($map, $callback_arguments);
   $map['baseLayerCount'] = count($map['base layers']);
   $map['overlayLayerCount'] = count($map['overlay layers']);
   $map['height'] = $height;
@@ -296,7 +296,7 @@ function _gm_leaflet_prepare_maps_plugin(&$map, $callback_arguments = array()) {
   $map['overlay layers'] = array();
 
   foreach ($layers as $key => $layer) {
-    $arguments = isset($callback_arguments[$layer]) ? $callback_arguments[$layer] : array();
+    $arguments = isset($callback_arguments['overlay_layers'][$layer]) ? $callback_arguments['overlay_layers'][$layer] : array();
     $plugin = gm_leaflet_get_overlay_layers($layer);
     $map['overlay layers'][$layer] = $plugin;
 
