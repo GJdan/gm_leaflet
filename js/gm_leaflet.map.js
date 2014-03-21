@@ -15,12 +15,16 @@
         map.addControl(zoomFS);
 
         if (mapSettings.zoomToLayer && !mapSettings.noSetView) {
-          if (mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.boundingBox) {
-            bBox = mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.boundingBox;
-            map.fitBounds([[bBox.miny, bBox.minx], [bBox.maxy, bBox.maxx]]);
-          } else if (mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.centroid) {
-            view = mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView
-            map.setView([view.centroid.lat, view.centroid.lon], view.zoom);
+          if ($.isArray(mapSettings.zoomToLayer)) {
+            mapSettings.zoomLayer = new L.FeatureGroup();
+          } else {
+            if (mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.boundingBox) {
+              bBox = mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.boundingBox;
+              map.fitBounds([[bBox.miny, bBox.minx], [bBox.maxy, bBox.maxx]]);
+            } else if (mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView.centroid) {
+              view = mapSettings['overlay layers'][mapSettings.zoomToLayer].data.setView
+              map.setView([view.centroid.lat, view.centroid.lon], view.zoom);
+            }
           }
         } else if (mapSettings.lat && mapSettings.lon && !mapSettings.noSetView) {
           map.setView([mapSettings.lat, mapSettings.lon], mapSettings.zoom);
@@ -65,6 +69,11 @@
           if (!mapSettings['switcher overlay layers'] || $.inArray(name, mapSettings['switcher overlay layers']) != -1) {
             overlayLayers[layerSettings.name] = layer;
           }
+
+          // If an array of layers was passed to mapSettings.zoomToLayer check if this layer is included and add it.
+          if ($.isArray(mapSettings.zoomToLayer) && $.inArray(name, mapSettings.zoomToLayer) != -1) {
+            mapSettings.zoomLayer.addLayer(layer);
+          }
         });
 
         layerSwitcher = L.control.layers(baseLayers, overlayLayers);
@@ -86,6 +95,11 @@
           Drupal[customjs["callback"]](map, mapSettings, customjs, layerSwitcher); // Every customjs plugin is passed the map, the mapSettings object, and its own settings.
         });
 
+        // If an array of layers was passed to mapSettings.zoomToLayer now is time to zoom
+        if ($.isArray(mapSettings.zoomToLayer)) {
+          var bounds = mapSettings.zoomLayer.getBounds();
+          map.fitBounds(bounds);
+        }
       }); // End of loop through maps
     }
   };
