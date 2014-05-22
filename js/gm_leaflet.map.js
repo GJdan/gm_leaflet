@@ -38,9 +38,9 @@
           var layer;
 
           if (layerSettings.type == 'tile layer') {
-            layer = gmLeafletAddTileLayer(name, layerSettings);
+            layer = gmLeafletAddTileLayer(name, mapSettings, layerSettings);
           } else if (layerSettings.type == 'wms') {
-            layer = gmLeafletAddWMS(name, layerSettings);
+            layer = gmLeafletAddWMS(name, mapSettings, layerSettings);
           }
 
           if (mapSettings.baseLayerCount == 1 || mapSettings['default base layer'] == name) {
@@ -58,9 +58,9 @@
 
           // If the data is GeoJSON we may have to prepare it for the leaflet constructor...
           if (layerSettings.type == 'GeoJSON') {
-            gmLeafletAddGeoJSONLayer(name, layerSettings, layer);
+            gmLeafletAddGeoJSONLayer(name, mapSettings, layerSettings, layer);
           } else if (layerSettings.type == 'wms') {
-            layer = gmLeafletAddWMS(name, layerSettings);
+            layer = gmLeafletAddWMS(name, mapSettings, layerSettings);
           }
 
           if (!mapSettings['enabled overlay layers'] || $.inArray(name, mapSettings['enabled overlay layers']) != -1) {
@@ -104,19 +104,19 @@
     }
   };
 
-  function gmLeafletAddTileLayer(name, layerSettings) {
+  function gmLeafletAddTileLayer(name, mapSettings, layerSettings) {
     var layer = new L.TileLayer(layerSettings['url template'], layerSettings.settings);
 
     return layer;
   }
 
-  function gmLeafletAddWMS(name, layerSettings) {
+  function gmLeafletAddWMS(name, mapSettings, layerSettings) {
     var layer = new L.TileLayer.WMS(layerSettings.url, layerSettings.settings);
 
     return layer;
   }
 
-  function gmLeafletAddGeoJSONLayer(layerName, layerSettings, layer) {
+  function gmLeafletAddGeoJSONLayer(layerName, mapSettings, layerSettings, layer) {
     $.each(layerSettings.data.features, function(i, featureSettings) {
       var geom;
 
@@ -147,7 +147,9 @@
 
       var feature = new L.GeoJSON(geom, jsonOptions);
       if (featureSettings.popup) {
-        feature.bindPopup(featureSettings.popup);
+        var popup = L.DomUtil.create('div', mapSettings.id + '-popup');
+        popup.innerHTML += featureSettings.popup;
+        feature.bindPopup(popup);
       }
       layer.addLayer(feature);
     });
