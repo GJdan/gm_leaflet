@@ -76,7 +76,9 @@
           }
         });
 
-        layerSwitcher = L.control.layers(baseLayers, overlayLayers);
+        layerSwitcher = L.control.layers(baseLayers, overlayLayers, {
+          collapsed: mapSettings.collapsedSwitcher
+        });
         layerSwitcher.addTo(map);
 
         // Event listeners...

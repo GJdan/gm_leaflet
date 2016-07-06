@@ -29,6 +29,7 @@ function gm_leaflet_ctools_plugin_type() {
       'overlay layers' => array(),
       'custom_js' => array(),
       'settings' => array(),
+      'collapsedSwitcher' => TRUE,
     ),
   );
   $plugins['base_layers'] = array(
