@@ -10,7 +10,13 @@
         }
         $.extend(mapOptions, mapSettings.settings);
 
-        var map = L.map(mapSettings.id, mapOptions);
+        if (!mapSettings.initialized) {
+          var map = L.map(mapSettings.id, mapOptions);
+          mapSettings.initialized = true;
+        } else {
+          return;
+        }
+
         var zoomFS = new L.Control.ZoomFS();
         map.addControl(zoomFS);
 
