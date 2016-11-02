@@ -100,12 +100,12 @@ function gm_leaflet_libraries_info() {
     'download url' => 'http://leaflet-cdn.s3.amazonaws.com/build/leaflet-0.5.1.zip',
     'version arguments' => array(
       'file' => 'leaflet-src.js',
-      'pattern' => '@L\.version\s*=\s*[\'\"]([\d\.]+)[\'\"]@',
+      'pattern' => '@^\s*version: "(1\.0\.1\+ffcfcc1)"@',
       'lines' => 40,
     ),
     'files' => array(
       'js' => array(
-        'leaflet.js' => array(
+        'leaflet-src.js' => array(
           'type' => 'file',
           'group' => JS_LIBRARY,
           'preprocess' => FALSE,
@@ -116,12 +116,12 @@ function gm_leaflet_libraries_info() {
           'type' => 'file',
           'media' => 'screen',
         ),
-        "leaflet.ie.css" => array(
-          'browsers' => array(
-            'IE' => 'lte IE 8',
-            '!IE' => FALSE,
-          ),
-        ),
+        //"leaflet.ie.css" => array(
+        //  'browsers' => array(
+        //    'IE' => 'lte IE 8',
+        //    '!IE' => FALSE,
+        //  ),
+        //),
       ),
     ),
   );
@@ -153,7 +153,7 @@ function gm_leaflet_libraries_info() {
     'path' => 'dist',
     'version arguments' => array(
       'file' => 'CHANGELOG.md',
-      'pattern' => '@[\s#]*([\d\.]+)\s*\(\d{4}-\d{2}-\d{2}\)@',
+      'pattern' => '@[\s#]*(([\d\.]+)\s*\(\d{4}-\d{2}-\d{2}\)|Master)@',
     ),
     'files' => array(
       'js' => array(
