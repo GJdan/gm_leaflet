@@ -84,6 +84,7 @@
 
         layerSwitcher = L.control.layers(baseLayers, overlayLayers, {
           collapsed: mapSettings.collapsedSwitcher
+          // collapsed: true
         });
         layerSwitcher.addTo(map);
 
